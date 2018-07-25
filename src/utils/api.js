@@ -1,3 +1,5 @@
+import fetch from './fetch';
+
 export const _getJSONAPIErrorsObject = e => [{ title: e.message || '', detail: e.message || '', code: e.code || e.message || '' }];
 
 class Api {
