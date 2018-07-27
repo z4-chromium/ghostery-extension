@@ -16,29 +16,73 @@ const apiConfig = {
 chrome.registerPlugin(new CookiePlugin());
 api.init(apiConfig, {});
 jest.mock('../fetch');
+let csrfCookie;
 
-describe('_sendReq', () => {
+describe('src/utils/api.js success', () => {
 	beforeEach(() => {
-	});
-
-	it('should resolve with response status', async () => {
-		sinon.spy(chrome.cookies, 'set');
-
-		const csrfCookie = {
-			url: 'http://localhost',
+		sinon.spy(chrome.cookies, 'get');
+		csrfCookie = {
+			url: `https://${apiConfig.CSRF_DOMAIN}.com`,
 			name: 'csrf_token',
-			value: 'test_csrf_token_val_123'
-		}
-
-		// add csrf cookie for this test
+			value: `test_csrf_token_val_${Math.floor(Math.random() * 1000000000)}`
+		};
 		chrome.cookies.set(csrfCookie);
-
-		// make request with csrf cookie
-		const response = await api._sendReq('GET', '/status', {});
-
-		expect(chrome.cookies.set.calledWith(csrfCookie)).toBeTruthy();
-		expect(response).toBeDefined();
-
 	});
 
+	afterEach(() => {
+		chrome.cookies.remove(csrfCookie, () => {});
+		chrome.cookies.get.restore();
+	});
+
+	it('_getCsrfCookie should resolve with cookie token', async () => {
+		const response = await api._getCsrfCookie();
+		expect(response).toBeTruthy();
+	});
+
+	it('_sendReq should get cookie token and resolve with request response', async () => {
+		// make request with csrf cookie
+		const response = await api._sendReq('GET', '/', {});
+
+		expect(chrome.cookies.get.called).toBeTruthy();
+		expect(response).toBeDefined();
+	});
+
+	it('_sendAuthenticatedRequest resolve with request response', async () => {
+		// make request with csrf cookie
+		const response = await api._sendAuthenticatedRequest('GET', '/user', {});
+		expect(chrome.cookies.get.called).toBeTruthy();
+		expect(response).toBeDefined();
+	});
+});
+
+describe('src/utils/api.js errors', () => {
+	beforeEach(() => {
+		sinon.spy(chrome.cookies, 'get');
+	});
+
+	afterEach(() => {
+		chrome.cookies.remove(csrfCookie, () => {});
+		chrome.cookies.get.restore();
+	});
+
+	it('_getCsrfCookie should resolve without cookie token', async () => {
+		const response = await api._getCsrfCookie();
+		expect(response).toBeFalsy();
+	});
+
+	it('_sendReq should resolve with response error status', async () => {
+		// make request with csrf cookie
+		const response = await api._sendReq('GET', '/', {});
+
+		expect(chrome.cookies.get.called).toBeTruthy();
+		expect(Number(response.status)).toBeGreaterThanOrEqual(400);
+	});
+
+	it('_sendAuthenticatedRequest should resolve with response error status', async () => {
+		// make request with csrf cookie
+		const response = await api._sendAuthenticatedRequest('GET', '/user', {});
+
+		expect(chrome.cookies.get.called).toBeTruthy();
+		expect(response.errors).toBeTruthy();
+	});
 });
