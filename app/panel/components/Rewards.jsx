@@ -210,17 +210,6 @@ class Rewards extends React.Component {
 					</div>
 				</div>
 			);
-		} else if (IS_EDGE) {
-			return (
-				<div className="RewardsPanel__info">
-					{ this.renderRewardSvg() }
-					<div>{ t('panel_detail_rewards_coming_soon') }</div>
-					<hr />
-					<div className="RewardsPanel__learn_more button primary hollow" onClick={this.handleFaqClick}>
-						{ t('panel_detail_learn_more') }
-					</div>
-				</div>
-			);
 		} else if (enable_offers && !rewardsArray) {
 			return (
 				<div className="RewardsPanel__info">

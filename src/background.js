@@ -1060,7 +1060,7 @@ function initializeDispatcher() {
 		panelData.init();
 	});
 	dispatcher.on('conf.save.enable_human_web', (enableHumanWeb) => {
-		if (!IS_EDGE && !IS_CLIQZ) {
+		if (!IS_CLIQZ) {
 			setCliqzModuleEnabled(humanweb, enableHumanWeb).then(() => {
 				setupABTest();
 			});
@@ -1070,7 +1070,7 @@ function initializeDispatcher() {
 	});
 	dispatcher.on('conf.save.enable_offers', (enableOffers) => {
 		button.update();
-		if (!IS_EDGE && !IS_CLIQZ) {
+		if (!IS_CLIQZ) {
 			if (!enableOffers) {
 				const actions = cliqz &&
 				cliqz.modules['offers-v2'] &&
@@ -1672,7 +1672,7 @@ function initializeGhosteryModules() {
 		Promise.all([
 			initialiseWebRequestPipeline(),
 		]).then(() => {
-			if (!(IS_EDGE || IS_CLIQZ)) {
+			if (!IS_CLIQZ) {
 				if (globals.JUST_UPGRADED_FROM_7) {
 					// These users had human web already, so we respect their choice
 					conf.enable_human_web = !humanweb.isDisabled;
@@ -1701,12 +1701,6 @@ function initializeGhosteryModules() {
 	}).catch((e) => {
 		log('cliqzStartup error', e);
 	});
-
-	if (IS_EDGE) {
-		setCliqzModuleEnabled(hpn, false);
-		setCliqzModuleEnabled(humanweb, false);
-		setCliqzModuleEnabled(offers, false);
-	}
 
 	if (IS_CLIQZ) {
 		setCliqzModuleEnabled(hpn, false);

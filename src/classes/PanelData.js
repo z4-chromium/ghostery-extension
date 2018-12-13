@@ -97,10 +97,6 @@ class PanelData {
 		let syncSetDataChanged = false;
 		let otherDataChanged = false;
 
-		if (IS_EDGE) {
-			data.enable_human_web = false;
-			data.enable_offers = false;
-		}
 		if (IS_CLIQZ) {
 			data.enable_human_web = false;
 			data.enable_offers = false;
