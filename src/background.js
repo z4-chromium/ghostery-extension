@@ -1766,15 +1766,6 @@ function initializeGhosteryModules() {
 		log('cliqzStartup error', e);
 	});
 
-<<<<<<< HEAD
-=======
-	if (IS_EDGE) {
-		setCliqzModuleEnabled(hpnv2, false);
-		setCliqzModuleEnabled(humanweb, false);
-		setCliqzModuleEnabled(offers, false);
-	}
-
->>>>>>> develop
 	if (IS_CLIQZ) {
 		setCliqzModuleEnabled(hpnv2, false);
 		setCliqzModuleEnabled(humanweb, false);
