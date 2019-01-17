@@ -29,7 +29,6 @@ import { getActiveTab, flushChromeMemoryCache } from '../utils/utils';
 import { objectEntries, log } from '../utils/common';
 
 const SYNC_SET = new Set(globals.SYNC_ARRAY);
-const IS_EDGE = (globals.BROWSER_INFO.name === 'edge');
 const { IS_CLIQZ } = globals;
 const policy = new Policy();
 /**
@@ -316,7 +315,7 @@ class PanelData {
 			.set('language', conf.language)
 			.set('notify_library_updates', conf.notify_library_updates)
 			.set('notify_upgrade_updates', conf.notify_upgrade_updates)
-			.set('offer_human_web', !IS_EDGE)
+			.set('offer_human_web', true)
 			.set('paused_blocking', globals.SESSION.paused_blocking)
 			.set('reload_banner_status', conf.reload_banner_status)
 			.set('selected_app_ids', conf.selected_app_ids)

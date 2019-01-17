@@ -342,17 +342,15 @@ class Metrics {
 			frequencies = ['all']; // eslint-disable-line no-param-reassign
 		}
 
-		if (!IS_EDGE && typeof fetch === 'function') {
-			const headers = new Headers();
-			headers.append('Content-Type', 'image/gif');
+		const headers = new Headers();
+		headers.append('Content-Type', 'image/gif');
 
-			options = {
-				headers,
-				referrerPolicy: 'no-referrer',
-				credentials: 'omit',
-				type: 'image'
-			};
-		}
+		options = {
+			headers,
+			referrerPolicy: 'no-referrer',
+			credentials: 'omit',
+			type: 'image'
+		};
 
 		frequencies.forEach((frequency) => {
 			if (this._checkPing(type, frequency)) {
@@ -365,17 +363,10 @@ class Metrics {
 
 				log(`sending ${type} ping with ${frequency} frequency`);
 
-				if (!IS_EDGE && typeof fetch === 'function') {
-					const request = new Request(metrics_url, options);
-					fetch(request).catch((err) => {
-						log(`Error sending Metrics ${type} ping`, err);
-					});
-				} else {
-					const xhr = new XMLHttpRequest();
-					xhr.open('GET', metrics_url, true);
-					xhr.setRequestHeader('Content-Type', 'image/gif');
-					xhr.send();
-				}
+				const request = new Request(metrics_url, options);
+				fetch(request).catch((err) => {
+					log(`Error sending Metrics ${type} ping`, err);
+				});
 			}
 		});
 	}

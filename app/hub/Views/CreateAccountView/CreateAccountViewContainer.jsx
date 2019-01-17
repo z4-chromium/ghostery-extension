@@ -42,6 +42,7 @@ class CreateAccountViewContainer extends Component {
 			passwordLengthError: false,
 			promotionsChecked: true,
 			validateInput: false,
+			origin: 'setup',
 		};
 
 		this.props.actions.setToast({
@@ -112,7 +113,8 @@ class CreateAccountViewContainer extends Component {
 			firstName,
 			lastName,
 			password,
-			promotionsChecked
+			promotionsChecked,
+			origin,
 		} = this.state;
 		const emailIsValid = email && validateEmail(email);
 		const confirmIsValid = confirmEmail && validateConfirmEmail(email, confirmEmail);
@@ -135,7 +137,7 @@ class CreateAccountViewContainer extends Component {
 			toastMessage: '',
 			toastClass: ''
 		});
-		this.props.actions.register(email, confirmEmail, firstName, lastName, password).then((success) => {
+		this.props.actions.register(email, confirmEmail, firstName, lastName, password, origin).then((success) => {
 			if (success) {
 				this.props.actions.updateAccountPromotions(promotionsChecked);
 				this.props.actions.getUser();

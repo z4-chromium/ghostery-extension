@@ -876,11 +876,10 @@ function onMessageHandler(request, sender, callback) {
 			});
 		return true;
 	} else if (name === 'account.register') {
-		const senderOrigin = (sender.url.indexOf('templates/panel.html') >= 0) ? 'extension' : 'setup';
-		metrics.ping(`create_account_${senderOrigin}`);
 		const {
-			email, confirmEmail, password, firstName, lastName
+			email, confirmEmail, password, firstName, lastName, origin
 		} = message;
+		metrics.ping(`create_account_${origin}`);
 		account.register(email, confirmEmail, password, firstName, lastName)
 			.then((response) => {
 				if (!response.hasOwnProperty('errors')) {
@@ -1798,7 +1797,7 @@ function initializeGhosteryModules() {
 		// auto-fetch from CMP
 		cmp.fetchCMPData();
 
-		if (!IS_EDGE && !IS_CLIQZ) {
+		if (!IS_CLIQZ) {
 			// auto-fetch human web offer
 			abtest.fetch().then(() => {
 				setupABTest();
