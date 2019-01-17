@@ -23,14 +23,16 @@ import { sendMessage, sendMessageInPromise, openSubscriptionPage } from '../util
 class Stats extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = this._reset(true);
+		this.state = this._reset();
 	}
 	/**
 	 * Lifecycle event
 	 */
 	componentDidMount() {
 		sendMessage('ping', 'hist_stats_panel');
-		if (!this._isSupporter(this.props)) {
+		if (!this._isPlus(this.props)) {
+			// eslint-disable-next-line
+			this.setState(this._reset(true));
 			return;
 		}
 		this._init();
@@ -39,10 +41,10 @@ class Stats extends React.Component {
 	 * Lifecycle event
 	 */
 	componentWillReceiveProps(nextProps) {
-		const nextSupporter = this._isSupporter(nextProps);
-		const thisSupporter = this._isSupporter(this.props);
-		if (nextSupporter !== thisSupporter) {
-			if (nextSupporter) {
+		const nextPlus = this._isPlus(nextProps);
+		const thisPlus = this._isPlus(this.props);
+		if (nextPlus !== thisPlus) {
+			if (nextPlus) {
 				this._init();
 			} else {
 				this.setState(this._reset(true));
@@ -149,7 +151,7 @@ class Stats extends React.Component {
 	 * @param {Object} event 		click event
 	 */
 	selectView = (event) => {
-		if (!this._isSupporter(this.props)) {
+		if (!this._isPlus(this.props)) {
 			return;
 		}
 		const state = Object.assign({}, this.state);
@@ -174,7 +176,7 @@ class Stats extends React.Component {
 	 * @param {Object} event 		click event
 	 */
 	selectType = (event) => {
-		if (!this._isSupporter(this.props)) {
+		if (!this._isPlus(this.props)) {
 			return;
 		}
 		const state = Object.assign({}, this.state);
@@ -188,39 +190,29 @@ class Stats extends React.Component {
 			selection.summaryData = this.getSummaryData(state, selection.type);
 			sendMessage('ping', selection.type);
 
+			const setTimeframes = (currentData, prevData) => {
+				const currentDate = prevData[selection.currentIndex].date;
+				for (let i = currentData.length - 1; i >= 0; i--) {
+					if (currentData[i].date.slice(0, 7) === currentDate.slice(0, 7)) {
+						selection.currentIndex = i;
+						break;
+					}
+				}
+
+				if (currentData.length <= 6) {
+					selection.timeframeSelectors.back = 'disabled';
+					selection.timeframeSelectors.forward = 'disabled';
+				} else {
+					selection.timeframeSelectors.back = selection.currentIndex === 0 ? 'disabled' : '';
+					selection.timeframeSelectors.forward = selection.currentIndex + 1 === currentData.length ? 'disabled' : '';
+				}
+			};
+
 			const { monthlyData, dailyData } = state;
 			if (selection.type === 'daily' && lastType !== 'daily') {
-				const currentDate = monthlyData[selection.currentIndex].date;
-				for (let i = dailyData.length - 1; i >= 0; i--) {
-					if (dailyData[i].date.slice(0, 7) === currentDate.slice(0, 7)) {
-						selection.currentIndex = i;
-						break;
-					}
-				}
-
-				if (dailyData.length < 6) {
-					selection.timeframeSelectors.back = 'disabled';
-					selection.timeframeSelectors.forward = 'disabled';
-				} else {
-					selection.timeframeSelectors.back = selection.currentIndex === 0 ? 'disabled' : '';
-					selection.timeframeSelectors.forward = selection.currentIndex + 1 === dailyData.length ? 'disabled' : '';
-				}
+				setTimeframes(dailyData, monthlyData);
 			} else if (selection.type !== 'daily' && lastType === 'daily') {
-				const currentDate = dailyData[selection.currentIndex].date;
-				for (let i = monthlyData.length - 1; i >= 0; i--) {
-					if (monthlyData[i].date.slice(0, 7) === currentDate.slice(0, 7)) {
-						selection.currentIndex = i;
-						break;
-					}
-				}
-
-				if (monthlyData.length < 6) {
-					selection.timeframeSelectors.back = 'disabled';
-					selection.timeframeSelectors.forward = 'disabled';
-				} else {
-					selection.timeframeSelectors.back = selection.currentIndex === 0 ? 'disabled' : '';
-					selection.timeframeSelectors.forward = selection.currentIndex + 1 === monthlyData.length ? 'disabled' : '';
-				}
+				setTimeframes(monthlyData, dailyData);
 			}
 
 			selection.selectionData = this._determineSelectionData(state);
@@ -235,7 +227,7 @@ class Stats extends React.Component {
 	 * @param {Object} event 		click event
 	 */
 	selectTimeframe = (e) => {
-		if (!this._isSupporter(this.props)) {
+		if (!this._isPlus(this.props)) {
 			return;
 		}
 		const state = Object.assign({}, this.state);
@@ -264,7 +256,7 @@ class Stats extends React.Component {
 	}
 
 	resetStats = () => {
-		if (!this._isSupporter(this.props)) {
+		if (!this._isPlus(this.props)) {
 			return;
 		}
 		this.setState({ showResetModal: true });
@@ -332,7 +324,7 @@ class Stats extends React.Component {
 			monthlyAverageData: clearData,
 			dailyAverageData: clearData,
 			showResetModal: false,
-			showPitchModal: (!this.props.user || !this.props.user.subscriptionsSupporter),
+			showPitchModal: (!this.props.user || !this.props.user.subscriptionsPlus),
 		};
 		return clearOrDemoState;
 	}
@@ -341,6 +333,10 @@ class Stats extends React.Component {
 		sendMessageInPromise('getAllStats')
 	);
 
+	/**
+	 * Retrieve locally stored stats and parse them
+	 * Save it in component's state
+	 */
 	_init = () => {
 		const state = Object.assign({}, this.state);
 		this._getAllStats().then((allData) => {
@@ -362,23 +358,21 @@ class Stats extends React.Component {
 				const dailyData = [];
 				const monthlyData = [];
 				const cumulativeMonthlyData = [];
-				// let prevDate = ''; // <-- see loop below
-				allData.forEach((dataItem, i) => {
-					// Use this loop to add zero values for days Ghostery wasn't used in
-					// case users find that to be clearer than passing over them
-					// if (i !== 0) {
-					// 	while (prevDate !== moment(dataItem.day).subtract(1, 'days').format('YYYY-MM-DD')) {
-					// 		prevDate = moment(prevDate).add(1, 'days').format('YYYY-MM-DD');
-					// 		dailyData.push({
-					// 			trackersSeen: 0,
-					// 			trackersBlocked: 0,
-					// 			trackersAnonymized: 0,
-					// 			adsBlocked: 0,
-					// 			date: prevDate,
-					// 		});
-					// 	}
-					// }
+				const accumulateData = (monthlyOrCumulative, currentDataItem) => {
+					if (monthlyOrCumulative === 'monthly') {
+						monthTrackersSeen += currentDataItem.trackersDetected;
+						monthTrackersBlocked += currentDataItem.trackersBlocked;
+						monthTrackersAnonymized += currentDataItem.cookiesBlocked + currentDataItem.fingerprintsRemoved;
+						monthAdsBlocked += currentDataItem.adsBlocked;
+					} else if (monthlyOrCumulative === 'cumulative') {
+						trackersSeen += currentDataItem.trackersDetected;
+						trackersBlocked += currentDataItem.trackersBlocked;
+						trackersAnonymized += currentDataItem.cookiesBlocked + currentDataItem.fingerprintsRemoved;
+						adsBlocked += currentDataItem.adsBlocked;
+					}
+				};
 
+				allData.forEach((dataItem, i) => {
 					// Day reassignments
 					dailyData.push({
 						trackersSeen: dataItem.trackersDetected,
@@ -388,24 +382,17 @@ class Stats extends React.Component {
 						date: dataItem.day,
 					});
 
-					trackersSeen += dataItem.trackersDetected;
-					trackersBlocked += dataItem.trackersBlocked;
-					trackersAnonymized += dataItem.cookiesBlocked + dataItem.fingerprintsRemoved;
-					adsBlocked += dataItem.adsBlocked;
-
 					// Monthly calculations
 					if (moment(dataItem.day).isSameOrBefore(endOfMonth) && i !== allData.length - 1) {
-						monthTrackersSeen += dataItem.trackersDetected;
-						monthTrackersBlocked += dataItem.trackersBlocked;
-						monthTrackersAnonymized += dataItem.cookiesBlocked + dataItem.fingerprintsRemoved;
-						monthAdsBlocked += dataItem.adsBlocked;
+						accumulateData('monthly', dataItem);
+						accumulateData('cumulative', dataItem);
 					} else {
-						const beginOfMonth = moment(endOfMonth).startOf('month');
+						if (moment(dataItem.day).isSameOrBefore(endOfMonth) && i === allData.length - 1) {
+							accumulateData('monthly', dataItem);
+							accumulateData('cumulative', dataItem);
+						}
 
-						monthTrackersSeen += dataItem.trackersDetected;
-						monthTrackersBlocked += dataItem.trackersBlocked;
-						monthTrackersAnonymized += dataItem.cookiesBlocked + dataItem.fingerprintsRemoved;
-						monthAdsBlocked += dataItem.adsBlocked;
+						const beginOfMonth = moment(endOfMonth).startOf('month');
 
 						const monthlyObj = {
 							date: beginOfMonth.format('YYYY-MM-DD'),
@@ -427,14 +414,42 @@ class Stats extends React.Component {
 						monthlyData.push(monthlyObj);
 						cumulativeMonthlyData.push(cumulativeMonthlyObj);
 
+						monthTrackersSeen = dataItem.trackersDetected;
+						monthTrackersBlocked = dataItem.trackersBlocked;
+						monthTrackersAnonymized = dataItem.cookiesBlocked + dataItem.fingerprintsRemoved;
+						monthAdsBlocked = dataItem.adsBlocked;
+
+						if (!moment(dataItem.day).isSameOrBefore(endOfMonth) && i === allData.length - 1) {
+							accumulateData('cumulative', dataItem);
+
+							const oneDayBeginOfMonth = moment(dataItem.day).startOf('month');
+
+							const oneDayMonthlyObj = {
+								date: oneDayBeginOfMonth.format('YYYY-MM-DD'),
+								trackersSeen: monthTrackersSeen,
+								trackersBlocked: monthTrackersBlocked,
+								trackersAnonymized: monthTrackersAnonymized,
+								adsBlocked: monthAdsBlocked,
+							};
+
+							const oneDayCumulativeMonthlyObj = {
+								date: oneDayBeginOfMonth.format('YYYY-MM-DD'),
+								trackersSeen,
+								trackersBlocked,
+								trackersAnonymized,
+								adsBlocked,
+							};
+
+							monthlyData.push(oneDayMonthlyObj);
+							cumulativeMonthlyData.push(oneDayCumulativeMonthlyObj);
+						}
+
 						endOfMonth = moment(dataItem.day).endOf('month');
 
-						monthTrackersSeen = 0;
-						monthTrackersBlocked = 0;
-						monthTrackersAnonymized = 0;
-						monthAdsBlocked = 0;
+						if (i !== allData.length - 1) {
+							accumulateData('cumulative', dataItem);
+						}
 					}
-					// prevDate = dataItem.day; // <-- see loop above
 				});
 				// Cumulative data totals
 				state.cumulativeData = {
@@ -475,7 +490,7 @@ class Stats extends React.Component {
 
 	/**
 	 * Determine data selection for Stats Graph according to parameters in state
-	 * Save it in state
+	 * Save it in component's state
 	 */
 	_determineSelectionData = (state = Object.assign({}, this.state)) => {
 		const {
@@ -497,17 +512,17 @@ class Stats extends React.Component {
 		return selectionData;
 	}
 
-	_isSupporter = props => props.user && props.user.subscriptionsSupporter
+	_isPlus = props => props.user && props.user.subscriptionsPlus;
 
 	/**
 	 * Render the the Stats View
-	 * @return {ReactComponent}   ReactComponent instance
+	 * @return {ReactComponent} StatsView instance
 	 */
 	render() {
 		return (
 			<StatsView
 				showResetModal={this.state.showResetModal}
-				showPitchModal={!this.props.user || !this.props.user.subscriptionsSupporter}
+				showPitchModal={!this.props.user || !this.props.user.subscriptionsPlus}
 				loggedIn={this.props.loggedIn}
 				getStats={this.getStats}
 				selection={this.state.selection}

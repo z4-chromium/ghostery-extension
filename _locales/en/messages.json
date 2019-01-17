@@ -18,7 +18,7 @@
 				"content": "</a>"
 			},
 			"link_terms_start": {
-				"content": "<a target=\"_blank\" href=\"https://www.ghostery.com/about-ghostery/privacy-statements/\" rel=\"noopener noreferrer\">"
+				"content": "<a target=\"_blank\" href=\"https://www.ghostery.com/about-ghostery/ghostery-terms-and-conditions/\" rel=\"noopener noreferrer\">"
 			}
 		}
 	},
@@ -1790,17 +1790,17 @@
 	"hub_supporter_perk_themes_description": {
 		"message": "Customize the Ghostery colors - try our Midnight theme!"
 	},
-	"hub_supporter_perk_support_title": {
-		"message": "Priority Support"
+	"hub_supporter_perk_stats_title": {
+		"message": "Historical Blocking Stats"
 	},
-	"hub_supporter_perk_support_description": {
-		"message": "Resolve issues fast with our Priority help desk service"
+	"hub_supporter_perk_stats_description": {
+		"message": "View your blocking statistics and see how Ghostery is working for you"
 	},
 	"hub_supporter_perk_more_title": {
-		"message": "...and More!"
+		"message": "Priority Support & More"
 	},
 	"hub_supporter_perk_more_description": {
-		"message": "Stay tuned for cool features to come"
+		"message": "Resolve issues fast with our Priority help desk service - and more perks to come"
 	},
 	"hub_supporter_manifesto": {
 		"message": "We strive to deliver the best privacy protection services to our users free of cost. While we do not charge for our privacy suite, you may choose to support us through a small monthly subscription. Join us in our mission by upgrading to Ghostery Plus - and unlock cool perks along the way!"
@@ -1811,11 +1811,17 @@
 	"hub_supporter_feature_theme_description": {
 		"message": "Customize the Ghostery colors for a new visual experience! Introduced through popular request. Check out our special Midnight theme, and more to come."
 	},
+	"hub_supporter_feature_stats_title": {
+		"message": "Historical Blocking Stats"
+	},
+	"hub_supporter_feature_stats_description": {
+		"message": "View historical blocking results with graphs and statistics to reveal trends and learn how Ghostery has affected your browsing."
+	},
 	"hub_supporter_feature_support_title": {
 		"message": "Priority Support"
 	},
 	"hub_supporter_feature_support_description": {
-		"message": "Need assistance? Find a broken page? Have your questions answered and issues resolved fast with our Priority help desk service, accessible only when signed in with a Supporter account."
+		"message": "Need assistance? Find a broken page? Have your questions answered and issues resolved fast with our Priority help desk service, accessible only when signed in with a Plus account."
 	},
 	"hub_supporter_feature_more_title": {
 		"message": "..and More to Come!"
@@ -1926,10 +1932,10 @@
 		"message": "code copied"
 	},
 	"rewards_expires_in_day": {
-		"message": "Expires in 1 day"
+		"message": "Available for 1 day"
 	},
 	"rewards_expires_in_days": {
-		"message": "Expires in $COUNT$ days",
+		"message": "Available for $COUNT$ days",
 		"placeholders": {
 			"count": {
 				"content": "$1"
@@ -1937,10 +1943,10 @@
 		}
 	},
 	"rewards_expires_in_hour": {
-		"message": "Expires in 1 hour"
+		"message": "Available for 1 hour"
 	},
 	"rewards_expires_in_hours": {
-		"message": "Expires in $COUNT$ hours",
+		"message": "Available for $COUNT$ hours",
 		"placeholders": {
 			"count": {
 				"content": "$1"
@@ -1948,10 +1954,10 @@
 		}
 	},
 	"rewards_expires_in_min": {
-		"message": "Expires in 1 min"
+		"message": "Available for 1 min"
 	},
 	"rewards_expires_in_mins": {
-		"message": "Expires in $COUNT$ mins",
+		"message": "Available for $COUNT$ mins",
 		"placeholders": {
 			"count": {
 				"content": "$1"
@@ -1959,10 +1965,10 @@
 		}
 	},
 	"rewards_expires_in_sec": {
-		"message": "Expires in 1 sec"
+		"message": "Available for 1 sec"
 	},
 	"rewards_expires_in_secs": {
-		"message": "Expires in $COUNT$ secs",
+		"message": "Available for $COUNT$ secs",
 		"placeholders": {
 			"count": {
 				"content": "$1"
@@ -2084,10 +2090,7 @@
 		"message": "Change the color scheme of Ghostery!"
 	},
 	"subscription_tracker_stats": {
-		"message": "Historical Tracker Stats"
-	},
-	"subscription_tracker_stats_title" : {
-		"message": "Historical Tracker Stats"
+		"message": "Historical Stats"
 	},
 	"subscription_charge_date" : {
 		"message": "Next Payment Date"
