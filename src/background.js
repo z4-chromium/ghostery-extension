@@ -877,9 +877,8 @@ function onMessageHandler(request, sender, callback) {
 		return true;
 	} else if (name === 'account.register') {
 		const {
-			email, confirmEmail, password, firstName, lastName, origin
+			email, confirmEmail, password, firstName, lastName
 		} = message;
-		metrics.ping(`create_account_${origin}`);
 		account.register(email, confirmEmail, password, firstName, lastName)
 			.then((response) => {
 				if (!response.hasOwnProperty('errors')) {

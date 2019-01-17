@@ -122,9 +122,9 @@ export const login = (email, password) => dispatch => (
 		})
 );
 
-export const register = (email, confirmEmail, firstName, lastName, password, origin) => dispatch => (
+export const register = (email, confirmEmail, firstName, lastName, password) => dispatch => (
 	sendMessageInPromise('account.register', {
-		email, confirmEmail, firstName, lastName, password, origin
+		email, confirmEmail, firstName, lastName, password
 	}).then((res) => {
 		const { errors } = res;
 		if (errors) {

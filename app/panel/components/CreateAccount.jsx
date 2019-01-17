@@ -36,7 +36,6 @@ class CreateAccount extends React.Component {
 			loading: false,
 			passwordInvalidError: false,
 			passwordLengthError: false,
-			origin: 'extension',
 		};
 	}
 
@@ -67,7 +66,7 @@ class CreateAccount extends React.Component {
 		e.preventDefault();
 		this.setState({ loading: true }, () => {
 			const {
-				email, confirmEmail, firstName, lastName, password, origin
+				email, confirmEmail, firstName, lastName, password
 			} = this.state;
 			this.setState({ loading: true }, () => {
 				if (!validateEmail(email)) {
@@ -105,7 +104,7 @@ class CreateAccount extends React.Component {
 					passwordInvalidError: false,
 					passwordLengthError: false,
 				}, () => {
-					this.props.actions.register(email, confirmEmail, firstName, lastName, password, origin).then((success) => {
+					this.props.actions.register(email, confirmEmail, firstName, lastName, password).then((success) => {
 						this.setState({ loading: false });
 						if (success) {
 							new RSVP.Promise((resolve) => {
