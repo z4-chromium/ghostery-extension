@@ -1091,18 +1091,12 @@ function initializeDispatcher() {
 	});
 	dispatcher.on('conf.save.enable_offers', (enableOffersIn) => {
 		button.update();
-<<<<<<< HEAD
-		if (!IS_CLIQZ) {
-			if (!enableOffers) {
-				const actions = cliqz &&
-=======
 		let firstStep = Promise.resolve();
 		let enableOffers = enableOffersIn;
-		if (IS_EDGE || IS_CLIQZ) {
+		if (IS_CLIQZ) {
 			enableOffers = false;
 		} else if (!enableOffers) {
 			const actions = cliqz &&
->>>>>>> develop
 				cliqz.modules['offers-v2'] &&
 				cliqz.modules['offers-v2'].background &&
 				cliqz.modules['offers-v2'].background.actions;
